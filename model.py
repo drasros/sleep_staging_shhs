@@ -1,6 +1,3 @@
-# TODO: For BN: make sure to add BN statistics update
-# to train_op dependencies
-
 import tensorflow as tf
 
 import sys

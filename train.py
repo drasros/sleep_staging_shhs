@@ -50,7 +50,7 @@ def get_lines_list(file):
         lines = [l.strip() for l in lines]
         return lines
 
-
+# CAUTION: make sure you filesystem supports long filenames (>256chars)
 # def get_exp_name(nb_patients, batch_size, training_batches, learning_rates, conv_type, batch_norm, 
 #                  activations, featuremap_sizes, strides, filter_sizes, 
 #                  hiddenlayer_size, eps_before, eps_after, channel,
