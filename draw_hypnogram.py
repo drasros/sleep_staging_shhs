@@ -4,9 +4,6 @@ from model import CNN
 
 import shhs
 
-import sys
-sys.path.append('/home/arnaud/data_these/tensorflow1/tflib/')
-
 import ops
 import os
 import tensorflow as tf
@@ -119,6 +116,14 @@ print(pred_cl)
 
 np.save(os.path.join(save_dir, 'target.npy'), target_cl)
 np.save(os.path.join(save_dir, 'pred.npy'), pred_cl)
+
+plt.plot(range(len(target_cl)), target_cl)
+plt.savefig(os.path.join(save_dir, 'hyp_target.eps'), format='eps', dpi=300)
+plt.close()
+
+plt.plot(range(len(pred_cl)), pred_cl)
+plt.savefig(os.path.join(save_dir, 'hyp_pred.eps'), format='eps', dpi=300)
+plt.close()
 
 plt.plot(range(len(target_cl)), target_cl, range(len(target_cl)), pred_cl)
 plt.savefig(os.path.join(save_dir, 'hyp.eps'), format='eps', dpi=300)

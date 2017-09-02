@@ -1,8 +1,5 @@
 import tensorflow as tf
 
-import sys
-sys.path.append('/home/arnaud/data_these/tensorflow1/tflib/')
-
 import ops
 
 import convsize

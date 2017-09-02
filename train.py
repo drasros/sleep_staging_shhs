@@ -13,9 +13,6 @@ from tqdm import tqdm
 
 import shhs
 
-import sys
-sys.path.append('/home/arnaud/data_these/tensorflow1/tflib')
-
 import ops
 
 from model import CNN
@@ -24,7 +21,7 @@ from model import CNN
 ############  CONFIG #####################################
 shhs_base_dir = '/datadrive1/data/shhs'
 
-exp_num = '10'
+exp_num = '12'
 results_dir = '/datadrive1/exp' + exp_num + '/'
 
 checkpoint_dir = '/datadrive1/tmp'+exp_num+'/'
