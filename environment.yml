@@ -1,0 +1,48 @@
+name: sleepstudytf
+channels:
+- defaults
+dependencies:
+- openssl=1.0.2l=0
+- pip=9.0.1=py36_1
+- python=3.6.2=0
+- readline=6.2=2
+- setuptools=27.2.0=py36_0
+- sqlite=3.13.0=0
+- tk=8.5.18=0
+- wheel=0.29.0=py36_0
+- xz=5.2.2=1
+- zlib=1.2.8=3
+- pip:
+  - appdirs==1.4.3
+  - backports.weakref==1.0rc1
+  - bleach==1.5.0
+  - certifi==2017.7.27.1
+  - chardet==3.0.4
+  - cycler==0.10.0
+  - html5lib==0.9999999
+  - idna==2.6
+  - markdown==2.6.8
+  - matplotlib==2.0.2
+  - matplotlib2tikz==0.6.12
+  - numpy==1.13.1
+  - olefile==0.44
+  - pillow==4.2.1
+  - pipdate==0.2.0
+  - protobuf==3.3.0
+  - pyedflib==0.1.9
+  - pyparsing==2.2.0
+  - pyqt5==5.9
+  - python-dateutil==2.6.1
+  - pytz==2017.2
+  - requests==2.18.4
+  - scikit-learn==0.18.2
+  - scipy==0.19.1
+  - sip==4.19.3
+  - six==1.10.0
+  - sklearn==0.0
+  - tensorflow-gpu==1.2.1
+  - tqdm==4.15.0
+  - urllib3==1.22
+  - werkzeug==0.12.2
+prefix: /home/arnaud/anaconda3/envs/sleepstudytf
+
