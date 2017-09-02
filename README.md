@@ -9,7 +9,7 @@ conda env create -f=environment.yml
 
 # Obtaining data
 
-Please follow instructions from [SHHS website](https://sleepdata.org/datasets/shhs). 
+Please follow instructions from the [SHHS website](https://sleepdata.org/datasets/shhs). 
 
 # Train
 
