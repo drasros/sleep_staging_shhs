@@ -337,13 +337,10 @@ def patient_names_iterator(preprocessed_names):
         yield preprocessed_names[mix[i]]
 
 def data_iterator_1p(preprocessed_name, epochs_before, epochs_after, 
-                     balance_classes=True, use_if_missing_stage=False,
-                     shuffle_within_patient=True):
+                     balance_classes=True, use_if_missing_stage=False):
     # Note: even with the 'balanced=True' and 'use_if_missing_stage'
     # options, there can be be a slight imbalance
     # due to samples not yielded when incomplete=True. This is normal. 
-
-    totalyielded = 0
 
     with open(preprocessed_name, 'rb') as fp:
         data = pickle.load(fp)
@@ -364,17 +361,34 @@ def data_iterator_1p(preprocessed_name, epochs_before, epochs_after,
         indices_to_yield = indices_per_class
     indices_to_yield = np.concatenate(indices_to_yield)
 
-    if shuffle_within_patient:
-        np.random.shuffle(indices_to_yield)
+    np.random.shuffle(indices_to_yield)
 
     nb_ex_to_yield = len(indices_to_yield)
 
     for i in range(nb_ex_to_yield):
         idx = indices_to_yield[i]
-        res = read_one_idx(epochs, stages, idx, epochs_before, epochs_after)
+        res = read_one_idx(epochs, stages, idx, 
+                           epochs_before, epochs_after)
         if res is not None and yield_or_not:
-            #print(totalyielded)
-            totalyielded += 1
+            yield res
+
+def data_iterator_1p_ordered(preprocessed_name, epochs_before, epochs_after,
+                             balance_classes=True, use_if_missing_stage=False):
+    # ordered, for drawing hypnogram
+    with open(preprocessed_name, 'rb') as fp:
+        data = pickle.load(fp)
+    epochs, stages = data
+    stages = np.array(stages)
+
+    cl, cnts = np.unique(stages, return_counts=True)
+    nb_cl = len(cl)
+    cl_is_5 = nb_cl==5
+    yield_or_not = True if use_if_missing_stage else cl_is_5
+    
+    for idx in range(len(stages)):
+        res = read_one_idx(epochs, stages, idx, 
+                           epochs_before, epochs_after)
+        if res is not None and yield_or_not:
             yield res
 
 def read_one_idx(epochs, stages, idx, epochs_before, epochs_after):

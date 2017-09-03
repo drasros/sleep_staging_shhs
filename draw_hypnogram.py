@@ -83,9 +83,9 @@ patient_to_plot = os.path.join(shhs_base_dir, 'preprocessed', 'shhs1',
                                 'nofilter', 'EEG', l)# + '.p')
 print(patient_to_plot)
 
-it_p = shhs.data_iterator_1p(patient_to_plot, 2, 1, False, 
-                             use_if_missing_stage=False,
-                             shuffle_within_patient=False) # modify if needed
+it_p = shhs.data_iterator_1p_ordered(
+    patient_to_plot, 2, 1, False, 
+    use_if_missing_stage=False) # modify if needed
 
 target_cl = []
 pred_cl = []

@@ -4,7 +4,7 @@ The main dependencies are tensorflow/tensorflow-gpu, numpy, scipy, scikit-learn,
 
 The recommended way to install them is to use conda and import the attached environment:
 ```
-conda env create -f=environment.yml
+conda env create -f environment.yml
 ```
 
 ## Obtaining data
