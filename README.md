@@ -32,3 +32,9 @@ To visualize synthetic inputs as described in the paper:
 ```
 python visualize.py
 ```
+
+## Comparison
+
+```
+jupyter notebook comparison.ipynb
+```
