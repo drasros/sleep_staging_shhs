@@ -2,7 +2,8 @@
 
 The main dependencies are tensorflow/tensorflow-gpu, numpy, scipy, scikit-learn, matplotlib, pyedflib, tqdm. 
 
-The recommended way to install them is to use conda and import the attached environment:
+An easy way to install all dependencies is to work from a conda env. 
+Create the environment from the provided environment file. 
 ```
 conda env create -f environment.yml
 ```
