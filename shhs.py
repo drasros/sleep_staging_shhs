@@ -274,13 +274,6 @@ def data_iterator_1epoch(patient_names_iterator, n_patient_queues,
                          epochs_before, epochs_after, 
                          balance_classes=True, use_if_missing_stage=False):
 
-    # problem somewhere with this function
-    # it yields a number of example proportional to nb_patient_queues
-    # this is not normal
-    # probably what happens is that the iterators_1p share a same stop
-    # signal and stop too early..
-    # try to implement with multiprocessing
-
     iterators_1p = [data_iterator_1p(next(patient_names_iterator),
                                      epochs_before, epochs_after, 
                                      balance_classes, use_if_missing_stage) 
