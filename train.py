@@ -22,7 +22,7 @@ from model import CNN
 ############  CONFIG #####################################
 shhs_base_dir = '/datadrive1/data/shhs'
 
-exp_num = '12'
+exp_num = '13'
 results_dir = '/datadrive1/exp' + exp_num + '/'
 
 checkpoint_dir = '/datadrive1/tmp'+exp_num+'/'
@@ -340,7 +340,7 @@ def train(args, tvt_counts=None):
             lr = args.learning_rates[idx_lr]
 
 
-            if b % 10000==0:# b > 0 == 0:
+            if b % 10000==0 and b > 0:
                 print('--- Intermediate validation... ---')
                 cost, acc = test(args, model, names_valid, exp_dir, b, 
                                  current_best_cost, current_best_acc, 
