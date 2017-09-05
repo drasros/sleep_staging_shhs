@@ -214,7 +214,9 @@ def train(args, tvt_counts=None):
 
         tvt_proportions = (0.5, 0.2, 0.3)
         n_train = int(tvt_proportions[0]*len(preprocessed_names))
+        print('n_train: ', n_train)
         n_valid = int(tvt_proportions[1]*len(preprocessed_names))
+        print('n_valid: ', n_valid)
         names_train = preprocessed_names[0:n_train]
         names_valid = preprocessed_names[n_train:n_train+n_valid]
         names_test = preprocessed_names[n_train+n_valid:]
@@ -253,6 +255,7 @@ def train(args, tvt_counts=None):
         costs_valid = np.load(os.path.join(exp_checkpoint_dir_best, 'costs_valid.npy')).tolist()
         accs = np.load(os.path.join(exp_checkpoint_dir_best, 'accs.npy')).tolist()
         accs_valid = np.load(os.path.join(exp_checkpoint_dir_best, 'accs_valid.npy')).tolist()
+        # TODO: also save (and load) current_best_cost and current_best_acc
     else:
         costs = []
         costs_valid = []
@@ -261,6 +264,8 @@ def train(args, tvt_counts=None):
 
     ########## TRAIN ##############################
     print('TRAINING...')
+
+    which_val_metric = 'acc' #'cost' # whether to monitor acc or cost for best model
 
     try:
         #estimate how many batches an epoch is
@@ -313,6 +318,7 @@ def train(args, tvt_counts=None):
         # one batch every 5 train batches
 
         current_best_cost = 1e20
+        current_best_acc = 0.
 
         for b in range(np.sum(args.training_batches)): #tqdm(range(np.sum(args.training_batches))):
 
@@ -334,11 +340,14 @@ def train(args, tvt_counts=None):
             lr = args.learning_rates[idx_lr]
 
 
-            if b > 0 and b % 10000 == 0:
+            if b % 10000==0:# b > 0 == 0:
                 print('--- Intermediate validation... ---')
-                cost = test(args, model, names_valid, exp_dir, b, 
-                            current_best_cost, which_="valid")
-                if cost <= current_best_cost:
+                cost, acc = test(args, model, names_valid, exp_dir, b, 
+                                 current_best_cost, current_best_acc, 
+                                 which_="valid", which_metric=which_val_metric)
+                metric = cost if which_val_metric=='cost' else -acc
+                metric_best = current_best_cost if which_val_metric=='cost' else -current_best_acc
+                if metric <= metric_best:
                     model.save_model(os.path.join(exp_checkpoint_dir_best, 'model.ckpt'))
                     np.save(os.path.join(exp_checkpoint_dir_best, 'costs.npy'), np.array([*costs]))
                     np.save(os.path.join(exp_checkpoint_dir_best, 'accs.npy'), np.array([*accs]))
@@ -346,9 +355,14 @@ def train(args, tvt_counts=None):
                     np.save(os.path.join(exp_checkpoint_dir_best, 'accs_valid.npy'), np.array([*accs_valid]))
                     # test metrics. REM: another (faster) option is to reload only optimal model
                     # after training and test then...
-                    current_best_cost = cost
                     test(args, model, names_test, exp_dir, b, 
-                         1e20, save=True, which_="test")
+                         1e20, 0., save=True, which_="test",
+                         which_metric=which_val_metric)
+                # update current bests
+                if cost <= current_best_cost:
+                    current_best_cost = cost
+                if acc >= current_best_acc:
+                    current_best_acc = acc
 
             # occasionally print stuff during training
             if b > 0 and b % 1000 == 0:
@@ -382,15 +396,12 @@ def train(args, tvt_counts=None):
                 costs_valid += [cost_value]
                 accs_valid += [acc_value]
 
-            # later, if using non-balanced classes, 
-            # also valid and log some other measure such as confmat or kappa here.
-
             if b % 5000 == 0:
-                # TODO: USE APPEND MODE
                 np.save(os.path.join(exp_dir, 'costs.npy'), np.array([*costs]))
                 np.save(os.path.join(exp_dir, 'accs.npy'), np.array([*accs]))
                 np.save(os.path.join(exp_dir, 'costs_valid.npy'), np.array([*costs_valid]))
                 np.save(os.path.join(exp_dir, 'accs_valid.npy'), np.array([*accs_valid]))
+                # TODO: also save (and load) current_best_cost and current_best_acc
 
         # also save everything after training
         model.save_model(os.path.join(exp_checkpoint_dir, 'model.ckpt'))
@@ -415,11 +426,12 @@ def train(args, tvt_counts=None):
 
 
 def test(args, model, names_test, exp_dir, b_num, 
-         current_best_cost=None, save=True, which_="test"):
+         current_best_cost=None, current_best_acc=None,
+         save=True, which_="test", which_metric="cost"):
 
     assert which_ in ["test", "valid"]
 
-    assert current_best_cost is not None, "if saving only best model, please provide current best cost metrics"
+    assert not ((current_best_cost is None) and (current_best_acc is None)), "if saving only best model, please provide current best cost metrics"
     exp_dir_best = os.path.join(exp_dir, 'best')
     if not os.path.exists(exp_dir_best):
         os.makedirs(exp_dir_best)
@@ -427,8 +439,6 @@ def test(args, model, names_test, exp_dir, b_num,
     # REM: we call everything 'test' but actually also use this for VALID
 
     try:
-        metrics_test = None
-
         names_iterator_test = shhs.patient_names_iterator(names_test)
         it_1ep_test = shhs.data_iterator_1epoch(
             names_iterator_test, #5, 1, 1, True, False)
@@ -472,8 +482,11 @@ def test(args, model, names_test, exp_dir, b_num,
         print(which_ + ' acc:  ', acc_test)
         print('--------------------------------')
 
+        metric_test = cost_test if which_metric=="cost" else -acc_test
+        current_best_metric = current_best_cost if which_metric=="cost" else -current_best_acc
+
         # compare
-        if (cost_test <= current_best_cost) and save:
+        if (metric_test <= current_best_metric) and save:
 
             # labels, predictions, and counts
             labels_target_ints = np.array(labels_target_ints).flatten()
@@ -525,7 +538,7 @@ def test(args, model, names_test, exp_dir, b_num,
                             "Sklearn classification report: " + sk_class_rep + '\n')
             write_to_comment_file(os.path.join(exp_dir_best, 'metrics_'+which_+'.txt'), results_text)
 
-        return cost_test
+        return cost_test, acc_test
 
     except KeyboardInterrupt:
         model.close()
